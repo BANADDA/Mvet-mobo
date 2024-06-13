@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:marcci/models/FarmModel.dart';
 
 class MyFarmScreen extends StatelessWidget {
-  const MyFarmScreen({Key? key}) : super(key: key);
+  final FarmModel farm;
+  const MyFarmScreen({Key? key, required this.farm}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -37,7 +39,14 @@ class MyFarmScreen extends StatelessWidget {
     }
 
     return Scaffold(
-      appBar: AppBar(),
+      appBar: AppBar(
+        title: Text(
+          "My Farm",
+          style: TextStyle(
+              color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold),
+        ),
+        centerTitle: true,
+      ),
       body: Container(
         color: Colors.white,
         child: Column(
@@ -66,7 +75,7 @@ class MyFarmScreen extends StatelessWidget {
                     Padding(
                       padding: const EdgeInsets.symmetric(vertical: 8.0),
                       child: Text(
-                        "Daily Tasks",
+                        "Farm Statistics",
                         style: TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.bold,

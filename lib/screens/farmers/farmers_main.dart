@@ -48,7 +48,7 @@ class _FarmerDashboardState extends State<FarmerDashboard> {
         children: [
           buildServiceButton(
               "My Farm", "assets/images/my_farm.png", Color(0xFFDFF7D6), () {
-            Get.to(() => MyFarmScreen());
+            Get.to(() => MyFarmScreen(farm: farm));
             // Navigate to My Farm screen
           }),
           buildServiceButton(

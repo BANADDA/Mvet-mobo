@@ -1,0 +1,17 @@
+Passwrord:ilovemum999
+Key:key0
+First Name: key0
+Last Name: Mubaraka
+CITY:Kampala
+COUNTRY CODE: UG
+
+SHA1: FA:53:67:40:72:54:0C:57:F9:A2:96:0E:3C:73:E3:A3:F2:4B:E1:9A
+
+keytool -list -v -keystore /Users/mac/Desktop/github/marcci_mobile_app/mobi-save.jks -alias key0
+
+------------------------------------------------------------------------------------------------------------------------
+for marcci
+storeFile file("C://github/marcci-mobile-app/marcci-key.jks")
+storePassword "marcci2020"
+keyAlias "marcci"
+keyPassword "marcci2020"

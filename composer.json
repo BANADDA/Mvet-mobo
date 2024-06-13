@@ -1,0 +1,5 @@
+{
+    "require": {
+        "laravel-admin-extensions/multi-language": "*"
+    }
+}

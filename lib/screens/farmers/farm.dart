@@ -1,39 +1,50 @@
+import 'dart:js';
+
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:marcci/models/FarmModel.dart';
 
-class MyFarmScreen extends StatelessWidget {
+class MyFarmScreen extends StatefulWidget {
   final FarmModel farm;
   const MyFarmScreen({Key? key, required this.farm}) : super(key: key);
+  @override
+  State<MyFarmScreen> createState() => _MyFarmScreenState();
+}
 
+class _MyFarmScreenState extends State<MyFarmScreen> {
   @override
   Widget build(BuildContext context) {
     double screenWidth = MediaQuery.of(context).size.width;
     double screenHeight = MediaQuery.of(context).size.height;
 
-    Widget buildServiceButton(String title, String iconPath) {
-      return Container(
-        decoration: BoxDecoration(
-          color: Color(0xFFDFF7D6),
-          borderRadius: BorderRadius.circular(20),
-        ),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Image.asset(
-              iconPath,
-              height: 50,
-              width: 50,
-            ),
-            SizedBox(height: 10),
-            Text(
-              title,
-              style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
-                color: Colors.black,
+    Widget buildServiceButton(
+        String title, String iconPath, VoidCallback onPressed) {
+      return GestureDetector(
+        onTap: onPressed,
+        child: Container(
+          decoration: BoxDecoration(
+            color: Color(0xFFDFF7D6),
+            borderRadius: BorderRadius.circular(20),
+          ),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Image.asset(
+                iconPath,
+                height: 50,
+                width: 50,
               ),
-            ),
-          ],
+              SizedBox(height: 10),
+              Text(
+                title,
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.black,
+                ),
+              ),
+            ],
+          ),
         ),
       );
     }
@@ -59,10 +70,15 @@ class MyFarmScreen extends StatelessWidget {
                 mainAxisSpacing: 10,
                 shrinkWrap: true,
                 children: [
-                  buildServiceButton("Feeds", "assets/images/weather.png"),
-                  buildServiceButton("Health", "assets/images/equipment.png"),
-                  buildServiceButton("Animal", "assets/images/my_crops.png"),
-                  buildServiceButton("Yields", "assets/images/my_cattle.png"),
+                  buildServiceButton("Feeds", "assets/images/weather.png", () {
+                    _showAnimalFeedsBottomSheet(context);
+                  }),
+                  buildServiceButton(
+                      "Health", "assets/images/equipment.png", () {}),
+                  buildServiceButton(
+                      "Animal", "assets/images/my_crops.png", () {}),
+                  buildServiceButton(
+                      "Yields", "assets/images/my_cattle.png", () {}),
                 ],
               ),
             ),
@@ -117,16 +133,6 @@ class MyFarmScreen extends StatelessWidget {
                         ],
                       ),
                     ),
-                    Align(
-                      alignment: Alignment.bottomRight,
-                      child: FloatingActionButton(
-                        onPressed: () {
-                          // Add task action
-                        },
-                        backgroundColor: Colors.green,
-                        child: Icon(Icons.add),
-                      ),
-                    ),
                   ],
                 ),
               ),
@@ -157,6 +163,187 @@ class MyFarmScreen extends StatelessWidget {
         style: TextStyle(
           color: Colors.grey,
           fontWeight: FontWeight.bold,
+        ),
+      ),
+    );
+  }
+
+  void _showAnimalFeedsBottomSheet(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      builder: (BuildContext context) {
+        return StatefulBuilder(
+          builder: (BuildContext context, StateSetter setState) {
+            List<Map<String, dynamic>> feedData = [{}];
+            List<Widget> feedForms = [
+              _buildFeedForm(0, setState, feedData),
+            ];
+
+            void addFeedForm() {
+              setState(() {
+                feedData.add({});
+                feedForms.add(
+                    _buildFeedForm(feedData.length - 1, setState, feedData));
+              });
+            }
+
+            void removeFeedForm(int index) {
+              setState(() {
+                feedData.removeAt(index);
+                feedForms.removeAt(index);
+              });
+            }
+
+            void submitFeedData() {
+              bool isValid = true;
+              feedData.forEach((feed) {
+                if (feed['name'] == null ||
+                    feed['quantity'] == null ||
+                    feed['date'] == null) {
+                  isValid = false;
+                }
+              });
+
+              if (isValid) {
+                Navigator.pop(context);
+              } else {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text('Please fill all fields'),
+                  ),
+                );
+              }
+            }
+
+            return Padding(
+              padding: EdgeInsets.only(
+                bottom: MediaQuery.of(context).viewInsets.bottom,
+              ),
+              child: Container(
+                padding: EdgeInsets.all(16.0),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      "Animal Feeds",
+                      style: TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    Column(
+                      children: feedForms,
+                    ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: [
+                        // ElevatedButton(
+                        //   onPressed: addFeedForm,
+                        //   style: ElevatedButton.styleFrom(
+                        //     foregroundColor: Colors.white,
+                        //     backgroundColor: Colors.blue, // foreground
+                        //   ),
+                        //   child: Text("Add New Feed"),
+                        // ),
+                        ElevatedButton(
+                          onPressed: submitFeedData,
+                          style: ElevatedButton.styleFrom(
+                            foregroundColor: Colors.white,
+                            backgroundColor: Colors.blue, // foreground
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(10.0),
+                            ),
+                          ),
+                          child: Text("Submit Feeds"),
+                        )
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            );
+          },
+        );
+      },
+    );
+  }
+
+  Widget _buildFeedForm(
+      int index, StateSetter setState, List<Map<String, dynamic>> feedData) {
+    TextEditingController dateController = TextEditingController();
+
+    Future<void> _selectDate(BuildContext context) async {
+      final DateTime? picked = await showDatePicker(
+        context: context,
+        initialDate: DateTime.now(),
+        firstDate: DateTime(2000),
+        lastDate: DateTime(2101),
+      );
+      if (picked != null) {
+        setState(() {
+          dateController.text = DateFormat('yyyy-MM-dd').format(picked);
+          feedData[index]['date'] = dateController.text;
+        });
+      }
+    }
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8.0),
+      child: Container(
+        decoration: BoxDecoration(
+          border: Border.all(color: Colors.black),
+          borderRadius: BorderRadius.circular(10),
+        ),
+        padding: EdgeInsets.all(8.0),
+        child: Row(
+          children: [
+            Expanded(
+              child: TextField(
+                onChanged: (value) {
+                  feedData[index]['name'] = value;
+                },
+                decoration: InputDecoration(
+                  labelText: 'Feed Name',
+                  border: OutlineInputBorder(),
+                ),
+              ),
+            ),
+            SizedBox(width: 8),
+            Expanded(
+              child: TextField(
+                onChanged: (value) {
+                  feedData[index]['quantity'] = value;
+                },
+                decoration: InputDecoration(
+                  labelText: 'Quantity',
+                  border: OutlineInputBorder(),
+                ),
+                keyboardType: TextInputType.number,
+              ),
+            ),
+            SizedBox(width: 8),
+            Expanded(
+              child: GestureDetector(
+                onTap: () {
+                  _selectDate(context as BuildContext);
+                },
+                child: AbsorbPointer(
+                  child: TextField(
+                    controller: dateController,
+                    decoration: InputDecoration(
+                      labelText: 'Select Date',
+                      border: OutlineInputBorder(),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+            // IconButton(
+            //   icon: Icon(Icons.delete),
+            //   onPressed: () => removeFeedForm(index),
+            // ),
+          ],
         ),
       ),
     );

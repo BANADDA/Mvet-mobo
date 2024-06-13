@@ -44,3 +44,50 @@ app.*.map.json
 /android/app/debug
 /android/app/profile
 /android/app/release
+
+# Flutter/Dart/Pub related
+.dart_tool/
+.flutter-plugins
+.flutter-plugins-dependencies
+.packages
+.pub-cache
+.pub/
+
+# IDEs
+.idea/
+.vscode/
+
+# Obsolete and dependency related
+build/
+*.lock
+*.log
+
+# Coverage
+coverage/
+
+# macOS
+.DS_Store
+
+# iOS
+ios/Flutter/Flutter.framework
+ios/Flutter/Flutter.podspec
+ios/Flutter/Generated.xcconfig
+ios/Flutter/ephemeral
+ios/ServiceDefinitions.json
+ios/Pods/
+ios/Runner.xcworkspace/
+ios/Runner.xcworkspace/project.xcworkspace/
+ios/Flutter/App.framework
+ios/Flutter/Flutter.podspec.json
+ios/Flutter/Flutter.framework
+
+# Android
+android/app/build/
+android/.gradle/
+android/.idea/
+android/local.properties
+android/.settings/
+
+# Generated Files
+pubspec.lock
+

@@ -1,4 +1,4 @@
-import 'dart:js';
+// import 'dart:js';
 
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -74,11 +74,10 @@ class _MyFarmScreenState extends State<MyFarmScreen> {
                     _showAnimalFeedsBottomSheet(context);
                   }),
                   buildServiceButton(
-                      "Health", "assets/images/equipment.png", () {}),
+                      "Health", "assets/images/health.png", () {}),
+                  buildServiceButton("Animal", "assets/images/cow.png", () {}),
                   buildServiceButton(
-                      "Animal", "assets/images/my_crops.png", () {}),
-                  buildServiceButton(
-                      "Yields", "assets/images/my_cattle.png", () {}),
+                      "Yields", "assets/images/yields.png", () {}),
                 ],
               ),
             ),

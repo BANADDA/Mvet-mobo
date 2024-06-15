@@ -3,6 +3,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:marcci/models/FarmModel.dart';
+import 'package:dropdown_button2/dropdown_button2.dart';
 
 class MyFarmScreen extends StatefulWidget {
   final FarmModel farm;
@@ -73,11 +74,15 @@ class _MyFarmScreenState extends State<MyFarmScreen> {
                   buildServiceButton("Feeds", "assets/images/weather.png", () {
                     _showAnimalFeedsBottomSheet(context);
                   }),
-                  buildServiceButton(
-                      "Health", "assets/images/health.png", () {}),
-                  buildServiceButton("Animal", "assets/images/cow.png", () {}),
-                  buildServiceButton(
-                      "Yields", "assets/images/yields.png", () {}),
+                  buildServiceButton("Health", "assets/images/health.png", () {
+                    _showAnimalHealthBottomSheet(context);
+                  }),
+                  buildServiceButton("Animal", "assets/images/cow.png", () {
+                    _showAnimalAnimalBottomSheet(context);
+                  }),
+                  buildServiceButton("Yields", "assets/images/yields.png", () {
+                    _showAnimalYieldsBottomSheet(context);
+                  }),
                 ],
               ),
             ),
@@ -263,6 +268,500 @@ class _MyFarmScreenState extends State<MyFarmScreen> {
               ),
             );
           },
+        );
+      },
+    );
+  }
+
+  void _showAnimalYieldsBottomSheet(BuildContext context) {
+    String? _selectedAnimal;
+    String? _selectedYield;
+    String? _selectedUnit;
+    String _quantity = '';
+    DateTime? _date;
+    final formKey = GlobalKey<FormState>();
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      useSafeArea: true,
+      builder: (BuildContext context) {
+        return FractionallySizedBox(
+          heightFactor: 0.75,
+          child: Scaffold(
+            body: StatefulBuilder(
+              builder: (BuildContext context, StateSetter setState) {
+                final List<String> _animals = [
+                  'Cattle',
+                  'Goats',
+                  'Sheep',
+                  'Poultry',
+                  'Pigs',
+                  'Rabbits',
+                  'Fish'
+                ];
+                final List<String> _yields = [
+                  'Milk',
+                  'Meat',
+                  'Eggs',
+                  'Wool',
+                  'Hides',
+                  'Manure',
+                  'Fish'
+                ];
+                final List<String> _units = ['Litres', 'Kgs', 'None'];
+
+                return SingleChildScrollView(
+                  child: Container(
+                    padding: EdgeInsets.only(
+                      bottom: MediaQuery.of(context).viewInsets.bottom,
+                    ),
+                    child: Form(
+                        key: formKey,
+                        child:
+                            Column(mainAxisSize: MainAxisSize.max, children: [
+                          Padding(
+                            padding: const EdgeInsets.symmetric(
+                                vertical: 8.0, horizontal: 15.0),
+                            child: DropdownButton2<String>(
+                              dropdownStyleData: DropdownStyleData(
+                                decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(10),
+                                    color: Colors.grey[200]),
+                              ),
+                              isExpanded: true,
+                              hint: Text('Select Animal',
+                                  style: TextStyle(fontSize: 16)),
+                              value: _selectedAnimal,
+                              items: _animals
+                                  .map((animal) => DropdownMenuItem(
+                                        child: Padding(
+                                          padding: const EdgeInsets.all(0),
+                                          child: Text(
+                                            animal,
+                                            style: const TextStyle(
+                                              fontSize: 14,
+                                            ),
+                                          ),
+                                        ),
+                                        value: animal,
+                                      ))
+                                  .toList(),
+                              onChanged: (value) {
+                                setState(() {
+                                  _selectedAnimal = value!;
+                                });
+                              },
+                            ),
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.symmetric(
+                                vertical: 8.0, horizontal: 15.0),
+                            child: DropdownButton2<String>(
+                              dropdownStyleData: DropdownStyleData(
+                                decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(10),
+                                    color: Colors.grey[200]),
+                              ),
+                              isExpanded: true,
+                              hint: Text('Select Yield',
+                                  style: TextStyle(fontSize: 16)),
+                              value: _selectedYield,
+                              items: _yields
+                                  .map((yield) => DropdownMenuItem(
+                                        child: Text(
+                                          yield,
+                                          style: const TextStyle(
+                                            fontSize: 14,
+                                          ),
+                                        ),
+                                        value: yield,
+                                      ))
+                                  .toList(),
+                              onChanged: (value) {
+                                setState(() {
+                                  _selectedYield = value!;
+                                });
+                              },
+                            ),
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.symmetric(
+                                vertical: 8.0, horizontal: 15.0),
+                            child: TextFormField(
+                              onChanged: (value) {
+                                setState(() {
+                                  _quantity = value;
+                                });
+                              },
+                              decoration: InputDecoration(
+                                labelText: 'Quantity',
+                                border: OutlineInputBorder(
+                                    borderSide: BorderSide()),
+                              ),
+                              keyboardType: TextInputType.number,
+                            ),
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.symmetric(
+                                vertical: 8.0, horizontal: 15.0),
+                            child: DropdownButton2<String>(
+                              dropdownStyleData: DropdownStyleData(
+                                decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(10),
+                                    color: Colors.grey[200]),
+                              ),
+                              isExpanded: true,
+                              hint: Text('Select Units',
+                                  style: TextStyle(fontSize: 16)),
+                              value: _selectedUnit,
+                              items: _units
+                                  .map((unit) => DropdownMenuItem(
+                                        child: Text(
+                                          unit,
+                                          style: const TextStyle(
+                                            fontSize: 14,
+                                          ),
+                                        ),
+                                        value: unit,
+                                      ))
+                                  .toList(),
+                              onChanged: (value) {
+                                setState(() {
+                                  _selectedUnit = value!;
+                                });
+                              },
+                            ),
+                          ),
+                          //DATE
+                          Padding(
+                            padding: const EdgeInsets.symmetric(
+                                vertical: 8.0, horizontal: 15.0),
+                            child: ElevatedButton(
+                              onPressed: () {
+                                showDatePicker(
+                                  context: context,
+                                  initialDate: DateTime.now(),
+                                  firstDate: DateTime(2000),
+                                  lastDate: DateTime(2101),
+                                ).then((value) {
+                                  setState(() {
+                                    _date = value;
+                                  });
+                                });
+                              },
+                              style: ElevatedButton.styleFrom(
+                                  foregroundColor: Colors.white,
+                                  backgroundColor: Colors.green[500]),
+                              child: Text('Select Date'),
+                            ),
+                          ),
+
+                          Padding(
+                            padding: const EdgeInsets.symmetric(
+                                vertical: 8.0, horizontal: 15.0),
+                            child: ElevatedButton(
+                              onPressed: () {
+                                if (formKey.currentState!.validate() &&
+                                    _date != null &&
+                                    _selectedAnimal != null &&
+                                    _selectedYield != null &&
+                                    _selectedUnit != null) {
+                                  formKey.currentState!.save();
+                                  print({
+                                    'animal': _selectedAnimal,
+                                    'yield': _selectedYield,
+                                    'quantity': _quantity,
+                                    'unit': _selectedUnit,
+                                    'date': _date,
+                                  });
+                                  FocusManager.instance.primaryFocus?.unfocus();
+                                  Navigator.pop(context);
+                                } else {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(
+                                      content: Text('Please fill all fields'),
+                                    ),
+                                  );
+                                }
+                              },
+                              style: ElevatedButton.styleFrom(
+                                  foregroundColor: Colors.white,
+                                  backgroundColor: Colors.green[500]),
+                              child: Text('Submit'),
+                            ),
+                          ),
+                        ])),
+                  ),
+                );
+              },
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  void _showAnimalHealthBottomSheet(BuildContext context) {
+    String? _selectedAnimal;
+    String _symptoms = '';
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      useSafeArea: true,
+      builder: (BuildContext context) {
+        return FractionallySizedBox(
+          heightFactor: 0.75,
+          child: Scaffold(
+            body: StatefulBuilder(
+              builder: (BuildContext context, StateSetter setState) {
+                final List<String> _animals = [
+                  'Cattle',
+                  'Goats',
+                  'Sheep',
+                  'Poultry',
+                  'Pigs',
+                  'Rabbits',
+                  'Fish'
+                ];
+
+                return Container(
+                  padding: EdgeInsets.only(
+                    bottom: MediaQuery.of(context).viewInsets.bottom,
+                  ),
+                  child: Column(mainAxisSize: MainAxisSize.max, children: [
+                    Padding(
+                      padding: const EdgeInsets.symmetric(
+                          vertical: 8.0, horizontal: 15.0),
+                      child: DropdownButton2<String>(
+                        dropdownStyleData: DropdownStyleData(
+                          decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(10),
+                              color: Colors.grey[200]),
+                        ),
+                        isExpanded: true,
+                        hint: Text('Select Animal',
+                            style: TextStyle(fontSize: 16)),
+                        value: _selectedAnimal,
+                        items: _animals
+                            .map((animal) => DropdownMenuItem(
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(0),
+                                    child: Text(
+                                      animal,
+                                      style: const TextStyle(
+                                        fontSize: 14,
+                                      ),
+                                    ),
+                                  ),
+                                  value: animal,
+                                ))
+                            .toList(),
+                        onChanged: (value) {
+                          setState(() {
+                            _selectedAnimal = value!;
+                          });
+                        },
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(
+                          vertical: 8.0, horizontal: 15.0),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Padding(
+                            padding: const EdgeInsets.only(bottom: 10),
+                            child: Text('Symptoms and Status',
+                                style: TextStyle(
+                                    fontSize: 16, fontWeight: FontWeight.bold)),
+                          ),
+                          TextField(
+                            onChanged: (value) {
+                              setState(() {
+                                _symptoms = value;
+                              });
+                            },
+                            decoration: InputDecoration(
+                              border: OutlineInputBorder(
+                                  borderSide: BorderSide(
+                                      color: Colors.grey[200]!, width: 1.0)),
+                            ),
+                            maxLines: 3,
+                            keyboardType: TextInputType.multiline,
+                          ),
+                        ],
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(
+                          vertical: 8.0, horizontal: 15.0),
+                      child: ElevatedButton(
+                        onPressed: () {
+                          if (_selectedAnimal != null && _symptoms.isNotEmpty) {
+                            print({
+                              'animal': _selectedAnimal,
+                              'symptoms': _symptoms,
+                            });
+                            Navigator.pop(context);
+                          } else {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text('Please fill all fields'),
+                              ),
+                            );
+                          }
+                        },
+                        style: ElevatedButton.styleFrom(
+                            foregroundColor: Colors.white,
+                            backgroundColor: Colors.green[500]),
+                        child: Text('Submit'),
+                      ),
+                    ),
+                  ]),
+                );
+              },
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  void _showAnimalAnimalBottomSheet(BuildContext context) {
+    String? _selectedAnimal;
+    String? _quantity;
+    DateTime? _date;
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      useSafeArea: true,
+      builder: (BuildContext context) {
+        return FractionallySizedBox(
+          heightFactor: 0.75,
+          child: Scaffold(
+            body: StatefulBuilder(
+              builder: (BuildContext context, StateSetter setState) {
+                final List<String> _animals = [
+                  'Cattle',
+                  'Goats',
+                  'Sheep',
+                  'Poultry',
+                  'Pigs',
+                  'Rabbits',
+                  'Fish'
+                ];
+
+                return Container(
+                  padding: EdgeInsets.only(
+                    bottom: MediaQuery.of(context).viewInsets.bottom,
+                  ),
+                  child: Column(mainAxisSize: MainAxisSize.max, children: [
+                    Padding(
+                      padding: const EdgeInsets.symmetric(
+                          vertical: 8.0, horizontal: 15.0),
+                      child: DropdownButton2<String>(
+                        dropdownStyleData: DropdownStyleData(
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(10),
+                            color: Colors.grey[200],
+                          ),
+                        ),
+                        isExpanded: true,
+                        hint: Text('Select Animal',
+                            style: TextStyle(fontSize: 16)),
+                        value: _selectedAnimal,
+                        items: _animals
+                            .map((animal) => DropdownMenuItem(
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(0),
+                                    child: Text(
+                                      animal,
+                                      style: const TextStyle(
+                                        fontSize: 14,
+                                      ),
+                                    ),
+                                  ),
+                                  value: animal,
+                                ))
+                            .toList(),
+                        onChanged: (value) {
+                          setState(() {
+                            _selectedAnimal = value!;
+                          });
+                        },
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(
+                          vertical: 8.0, horizontal: 15.0),
+                      child: TextFormField(
+                        onChanged: (value) {
+                          setState(() {
+                            _quantity = value;
+                          });
+                        },
+                        decoration: InputDecoration(
+                          labelText: 'Quantity',
+                          border: OutlineInputBorder(),
+                        ),
+                        keyboardType: TextInputType.number,
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(
+                          vertical: 8.0, horizontal: 15.0),
+                      child: ElevatedButton(
+                        onPressed: () {
+                          showDatePicker(
+                            context: context,
+                            initialDate: DateTime.now(),
+                            firstDate: DateTime(2000),
+                            lastDate: DateTime(2101),
+                          ).then((value) {
+                            setState(() {
+                              _date = value;
+                            });
+                          });
+                        },
+                        style: ElevatedButton.styleFrom(
+                            foregroundColor: Colors.white,
+                            backgroundColor: Colors.green[500]),
+                        child: Text('Select Date'),
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(
+                          vertical: 8.0, horizontal: 15.0),
+                      child: ElevatedButton(
+                        onPressed: () {
+                          if (_selectedAnimal != null &&
+                              _quantity != null &&
+                              _date != null) {
+                            print({
+                              'animal': _selectedAnimal,
+                              'quantity': _quantity,
+                              'date': _date,
+                            });
+                            Navigator.pop(context);
+                          } else {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text('Please fill all fields'),
+                              ),
+                            );
+                          }
+                        },
+                        style: ElevatedButton.styleFrom(
+                            foregroundColor: Colors.white,
+                            backgroundColor: Colors.green[500]),
+                        child: Text('Submit'),
+                      ),
+                    ),
+                  ]),
+                );
+              },
+            ),
+          ),
         );
       },
     );

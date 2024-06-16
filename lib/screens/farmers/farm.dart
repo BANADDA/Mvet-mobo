@@ -1,5 +1,3 @@
-import 'dart:js';
-
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:marcci/models/FarmModel.dart';
@@ -145,13 +143,6 @@ class _MyFarmScreenState extends State<MyFarmScreen> {
 
   Widget buildTaskItem(String title, int quantity) {
     return ListTile(
-      leading: CircleAvatar(
-        backgroundColor: Colors.green,
-        child: Text(
-          quantity.toString(),
-          style: TextStyle(color: Colors.white),
-        ),
-      ),
       title: Text(
         title,
         style: TextStyle(
@@ -159,9 +150,10 @@ class _MyFarmScreenState extends State<MyFarmScreen> {
         ),
       ),
       trailing: Text(
-        "Tasks",
+        quantity.toString(),
         style: TextStyle(
           color: Colors.grey,
+          fontSize: 16,
           fontWeight: FontWeight.bold,
         ),
       ),

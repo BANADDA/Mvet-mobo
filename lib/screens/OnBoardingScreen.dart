@@ -7,7 +7,7 @@ import 'package:marcci/models/LoggedInUserModel.dart';
 import 'package:marcci/models/ManifestModel.dart';
 import 'package:marcci/screens/animal_officer/officer_main.dart';
 import 'package:marcci/screens/dvo/dvo_main.dart';
-import 'package:marcci/screens/farmers/farmers_main.dart';
+import 'package:marcci/screens/farmers/new_fram.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../theme/app_theme.dart';
@@ -119,7 +119,7 @@ class _OnBoardingScreenState extends State<OnBoardingScreen> {
           Get.offAll(() => DvoDashboard());
           break;
         case "6":
-          Get.offAll(() => FarmerDashboard());
+          Get.offAll(() => NewFarm());
           break;
         default:
           Get.offAll(() => BoardingWelcomeScreen());

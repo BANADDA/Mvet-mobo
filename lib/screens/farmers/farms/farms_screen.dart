@@ -11,7 +11,7 @@ import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:marcci/models/FarmModel.dart';
-import 'package:marcci/screens/farmers/farmers_main.dart';
+import 'package:marcci/screens/farmers/new_fram.dart';
 import 'package:marcci/screens/settings.dart';
 import 'package:marcci/widgets/appbar.dart';
 import 'package:path/path.dart' as path;
@@ -255,7 +255,7 @@ class _FarmsScreenState extends State<FarmsScreen> {
       print('Farm Photos: ${farm.farmPhotos}');
       print("Farmer Id: ${farm.farmerID}");
 
-      Get.to(() => FarmerDashboard);
+      Get.to(() => NewFarm);
     }
   }
 

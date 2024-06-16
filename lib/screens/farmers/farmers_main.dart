@@ -1,10 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:flutx/widgets/text/text.dart';
 import 'package:get/get.dart';
 import 'package:marcci/models/FarmModel.dart';
 import 'package:marcci/models/LoggedInUserModel.dart';
 import 'package:marcci/screens/farmers/farm.dart';
-import 'package:marcci/screens/farmers/farms/farms_screen.dart';
 import 'package:marcci/screens/settings.dart';
 import 'package:marcci/widgets/appbar.dart';
 import 'package:marcci/widgets/user_container.dart';
@@ -37,7 +35,7 @@ class _FarmerDashboardState extends State<FarmerDashboard> {
     return firstFarm;
   }
 
-  Widget buildFarmDetails(FarmModel farm) {
+  Widget buildFarmDetails() {
     return Padding(
       padding: const EdgeInsets.all(8.0),
       child: GridView.count(
@@ -48,7 +46,7 @@ class _FarmerDashboardState extends State<FarmerDashboard> {
         children: [
           buildServiceButton(
               "My Farm", "assets/images/my_farm.png", Color(0xFFDFF7D6), () {
-            Get.to(() => MyFarmScreen(farm: farm));
+            Get.to(() => MyFarmScreen());
             // Navigate to My Farm screen
           }),
           buildServiceButton(
@@ -84,24 +82,33 @@ class _FarmerDashboardState extends State<FarmerDashboard> {
       onTap: onTap,
       child: Container(
         decoration: BoxDecoration(
-          color: const Color.fromARGB(255, 216, 246, 217),
+          color: backgroundColor,
           borderRadius: BorderRadius.circular(20),
         ),
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Image.asset(
-              iconPath,
-              height: 50,
-              width: 50,
+            Expanded(
+              child: ClipRRect(
+                borderRadius: BorderRadius.only(
+                  topLeft: Radius.circular(20),
+                  topRight: Radius.circular(20),
+                ),
+                child: Image.asset(
+                  iconPath,
+                  fit: BoxFit.cover,
+                  width: double.infinity,
+                ),
+              ),
             ),
-            SizedBox(height: 10),
-            Text(
-              title,
-              style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
-                color: Colors.black,
+            Padding(
+              padding: const EdgeInsets.only(bottom: 10),
+              child: Text(
+                title,
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.black,
+                ),
               ),
             ),
           ],
@@ -187,77 +194,77 @@ class _FarmerDashboardState extends State<FarmerDashboard> {
             ),
             Expanded(
               child: FutureBuilder<FarmModel?>(
-                future: _firstFarmFuture,
-                builder: (context, snapshot) {
-                  if (snapshot.connectionState == ConnectionState.waiting) {
-                    return Center(
-                      child: CircularProgressIndicator(),
-                    );
-                  } else if (!snapshot.hasData || snapshot.data == null) {
-                    return Container(
-                      padding: EdgeInsets.all(15),
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Image.asset(
-                            'assets/images/oops.png',
-                          ), // Ensure this image exists in your assets
-                          SizedBox(height: 10),
-                          Padding(
-                            padding: const EdgeInsets.all(20.0),
-                            child: Text(
-                              "No farm profile found. Please register your farm with M-Vet",
-                              style: TextStyle(
-                                fontSize: 20,
-                                color: Color.fromARGB(255, 129, 130, 129),
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                          ),
-                          SizedBox(height: 20),
-                          ElevatedButton(
-                            onPressed: () {
-                              print("Pressed...");
-                              Get.to(() => FarmsScreen(farmer_id: user!.id));
-                            },
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: Colors
-                                  .green[800], // Dark green background color
-                              shape: RoundedRectangleBorder(
-                                borderRadius:
-                                    BorderRadius.circular(8.0), // Rounded edges
-                              ),
-                            ),
-                            child: Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: Row(
-                                mainAxisSize: MainAxisSize.min,
-                                children: <Widget>[
-                                  FxText(
-                                    'Profile Farm',
-                                    color: Colors.white,
-                                    fontSize: screenWidth *
-                                        0.045, // Responsive font size
-                                    fontWeight: 900,
-                                  ),
-                                  SizedBox(width: screenWidth * 0.02),
-                                  Icon(
-                                    Icons.add_home_work,
-                                    size: 24.0,
-                                    color: Colors.white,
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    );
-                  } else {
-                    return buildFarmDetails(snapshot.data!);
-                  }
-                },
-              ),
+                  future: _firstFarmFuture,
+                  builder: (context, snapshot) {
+                    // if (snapshot.connectionState == ConnectionState.waiting) {
+                    //   return Center(
+                    //     child: CircularProgressIndicator(),
+                    //   );
+                    // } else if (!snapshot.hasData || snapshot.data == null) {
+                    //   return Container(
+                    //     padding: EdgeInsets.all(15),
+                    //     child: Column(
+                    //       mainAxisAlignment: MainAxisAlignment.center,
+                    //       children: [
+                    //         Image.asset(
+                    //           'assets/images/oops.png',
+                    //         ), // Ensure this image exists in your assets
+                    //         SizedBox(height: 10),
+                    //         Padding(
+                    //           padding: const EdgeInsets.all(20.0),
+                    //           child: Text(
+                    //             "No farm profile found. Please register your farm with M-Vet",
+                    //             style: TextStyle(
+                    //               fontSize: 20,
+                    //               color: Color.fromARGB(255, 129, 130, 129),
+                    //               fontWeight: FontWeight.bold,
+                    //             ),
+                    //           ),
+                    //         ),
+                    //         SizedBox(height: 20),
+                    //         ElevatedButton(
+                    //           onPressed: () {
+                    //             print("Pressed...");
+                    //             Get.to(() => FarmsScreen(farmer_id: user!.id));
+                    //           },
+                    //           style: ElevatedButton.styleFrom(
+                    //             backgroundColor: Colors
+                    //                 .green[800], // Dark green background color
+                    //             shape: RoundedRectangleBorder(
+                    //               borderRadius:
+                    //                   BorderRadius.circular(8.0), // Rounded edges
+                    //             ),
+                    //           ),
+                    //           child: Padding(
+                    //             padding: const EdgeInsets.all(8.0),
+                    //             child: Row(
+                    //               mainAxisSize: MainAxisSize.min,
+                    //               children: <Widget>[
+                    //                 FxText(
+                    //                   'Profile Farm',
+                    //                   color: Colors.white,
+                    //                   fontSize: screenWidth *
+                    //                       0.045, // Responsive font size
+                    //                   fontWeight: 900,
+                    //                 ),
+                    //                 SizedBox(width: screenWidth * 0.02),
+                    //                 Icon(
+                    //                   Icons.add_home_work,
+                    //                   size: 24.0,
+                    //                   color: Colors.white,
+                    //                 ),
+                    //               ],
+                    //             ),
+                    //           ),
+                    //         ),
+                    //       ],
+                    //     ),
+                    //   );
+                    // } else {
+                    return buildFarmDetails();
+                    //   }
+                    // },
+                  }),
             ),
           ],
         ),

@@ -32,6 +32,15 @@ class _RegisterFarmerScreenState extends State<RegisterFarmerScreen> {
   bool isLoading = true;
   bool isSubmitting = false;
 
+  final TextEditingController farmNameController = TextEditingController();
+  List<Map<String, dynamic>> animals = [];
+  final TextEditingController farmCreatedDateController =
+      TextEditingController();
+  List<String> selectedFarmingSystems = [];
+  List<String> specifiedFarmingSystems = [];
+  List<String> selectedBioSecurityMeasures = [];
+  List<String> specifiedBioSecurityMeasures = [];
+
   @override
   void initState() {
     super.initState();
@@ -81,6 +90,21 @@ class _RegisterFarmerScreenState extends State<RegisterFarmerScreen> {
     );
   }
 
+  void _addAnimal() {
+    setState(() {
+      animals.add({
+        'type': TextEditingController(),
+        'quantity': TextEditingController(),
+      });
+    });
+  }
+
+  void _removeAnimal(int index) {
+    setState(() {
+      animals.removeAt(index);
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -107,27 +131,13 @@ class _RegisterFarmerScreenState extends State<RegisterFarmerScreen> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: <Widget>[
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: [
-                          _buildHeader(),
-                          const SizedBox(height: 20),
-                          _buildTextField(
-                              phoneController, Icons.phone, 'Phone Number'),
-                          const SizedBox(height: 10),
-                          _buildTextField(nameController, Icons.person, 'Name'),
-                          const SizedBox(height: 10),
-                          _buildDatePicker(dobController, 'Date of Birth'),
-                          const SizedBox(height: 10),
-                          _buildGenderPicker(),
-                          const SizedBox(height: 10),
-                          _buildSwitchTile(),
-                          const SizedBox(height: 20),
-                          _buildRegisterButton(),
-                          const SizedBox(height: 20),
-                          _buildLoginOption(),
-                        ],
-                      ),
+                      _buildFarmerProfileSection(),
+                      const SizedBox(height: 20),
+                      _buildFarmProfileSection(),
+                      const SizedBox(height: 20),
+                      _buildRegisterButton(),
+                      const SizedBox(height: 20),
+                      _buildLoginOption(),
                     ],
                   ),
                 ),
@@ -136,27 +146,248 @@ class _RegisterFarmerScreenState extends State<RegisterFarmerScreen> {
     );
   }
 
-  Widget _buildHeader() {
+  Widget _buildFarmerProfileSection() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'Create account',
+          'Farmer Profile',
           style: TextStyle(
             fontSize: 24,
             fontWeight: FontWeight.bold,
             color: Colors.teal[800],
           ),
         ),
-        const SizedBox(height: 5),
+        const SizedBox(height: 10),
+        _buildTextField(phoneController, Icons.phone, 'Phone Number'),
+        const SizedBox(height: 10),
+        _buildTextField(nameController, Icons.person, 'Name'),
+        const SizedBox(height: 10),
+        _buildDatePicker(dobController, 'Date of Birth'),
+        const SizedBox(height: 10),
+        _buildGenderPicker(),
+        const SizedBox(height: 10),
+        _buildSwitchTile(),
+      ],
+    );
+  }
+
+  Widget _buildFarmProfileSection() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
         Text(
-          'Please enter your details',
+          'Farm Profile',
           style: TextStyle(
-            fontSize: 16,
-            color: Colors.black54,
+            fontSize: 24,
+            fontWeight: FontWeight.bold,
+            color: Colors.teal[800],
           ),
         ),
+        const SizedBox(height: 10),
+        _buildTextField(farmNameController, Icons.home, 'Farm Name'),
+        const SizedBox(height: 10),
+        Row(
+          children: [
+            Expanded(
+                child: _buildTextField(
+                    TextEditingController(text: latitude.toString()),
+                    Icons.location_on,
+                    'Latitude')),
+            const SizedBox(width: 10),
+            Expanded(
+                child: _buildTextField(
+                    TextEditingController(text: longitude.toString()),
+                    Icons.location_on,
+                    'Longitude')),
+          ],
+        ),
+        const SizedBox(height: 10),
+        ElevatedButton(
+          onPressed: _getCurrentLocation,
+          style: ElevatedButton.styleFrom(
+            foregroundColor: Colors.white,
+            backgroundColor: Colors.teal,
+            padding: EdgeInsets.symmetric(vertical: 14.0),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12.0),
+            ),
+          ),
+          child: Center(
+            child: Text(
+              'Capture GPS Location',
+              style: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ),
+        ),
+        const SizedBox(height: 10),
+        Text(
+          'Animals',
+          style: TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.bold,
+            color: Colors.teal[800],
+          ),
+        ),
+        const SizedBox(height: 10),
+        ...animals.asMap().entries.map((entry) {
+          int index = entry.key;
+          Map<String, dynamic> animal = entry.value;
+          return Padding(
+            padding: const EdgeInsets.symmetric(vertical: 5.0),
+            child: Row(
+              children: [
+                Expanded(
+                  child: _buildTextField(
+                      animal['type'], Icons.pets, 'Animal Type'),
+                ),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: _buildTextField(animal['quantity'],
+                      Icons.format_list_numbered, 'Quantity'),
+                ),
+                IconButton(
+                  icon: Icon(Icons.close, color: Colors.red),
+                  onPressed: () {
+                    _removeAnimal(index);
+                  },
+                ),
+              ],
+            ),
+          );
+        }).toList(),
+        const SizedBox(height: 10),
+        ElevatedButton(
+          onPressed: _addAnimal,
+          style: ElevatedButton.styleFrom(
+            foregroundColor: Colors.white,
+            backgroundColor: Colors.teal,
+            padding: EdgeInsets.symmetric(vertical: 14.0),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12.0),
+            ),
+          ),
+          child: Center(
+            child: Text(
+              'Add Animal',
+              style: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ),
+        ),
+        const SizedBox(height: 10),
+        _buildMultiSelectChip(
+          'Farming Systems',
+          ['Zero Grazing', 'Paddock', 'Free Range', 'Others'],
+          selectedFarmingSystems,
+          specifiedFarmingSystems,
+        ),
+        const SizedBox(height: 10),
+        _buildDatePicker(farmCreatedDateController, 'Date Farm Was Created'),
+        const SizedBox(height: 10),
+        _buildMultiSelectChip(
+          'Bio Security Measures',
+          ['Fencing', 'Quarantine', 'Vaccination', 'Others'],
+          selectedBioSecurityMeasures,
+          specifiedBioSecurityMeasures,
+        ),
       ],
+    );
+  }
+
+  Widget _buildMultiSelectChip(String title, List<String> options,
+      List<String> selectedValues, List<String> specifiedValues) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          title,
+          style: TextStyle(
+            color: Colors.teal,
+            fontSize: 16,
+          ),
+        ),
+        Wrap(
+          spacing: 8.0,
+          children: options.map((option) {
+            bool isSelected = selectedValues.contains(option);
+            return ChoiceChip(
+              label: Text(option),
+              selected: isSelected,
+              onSelected: (selected) {
+                setState(() {
+                  if (selected) {
+                    selectedValues.add(option);
+                    if (option == 'Others') {
+                      _showSpecificationDialog(title, specifiedValues);
+                    }
+                  } else {
+                    selectedValues.remove(option);
+                    if (option == 'Others') {
+                      specifiedValues.clear();
+                    }
+                  }
+                });
+              },
+              selectedColor: Colors.teal,
+              backgroundColor: Colors.grey[200],
+            );
+          }).toList(),
+        ),
+        if (selectedValues.contains('Others'))
+          Padding(
+            padding: const EdgeInsets.only(top: 10.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: specifiedValues
+                  .map(
+                    (value) => Chip(
+                      label: Text(value),
+                      onDeleted: () {
+                        setState(() {
+                          specifiedValues.remove(value);
+                        });
+                      },
+                    ),
+                  )
+                  .toList(),
+            ),
+          ),
+      ],
+    );
+  }
+
+  void _showSpecificationDialog(String title, List<String> specifiedValues) {
+    TextEditingController specificationController = TextEditingController();
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Specify $title'),
+          content: TextField(
+            controller: specificationController,
+            decoration: InputDecoration(hintText: 'Enter specification'),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                if (specificationController.text.isNotEmpty) {
+                  setState(() {
+                    specifiedValues.add(specificationController.text);
+                  });
+                  Navigator.of(context).pop();
+                }
+              },
+              child: Text('Add'),
+            ),
+          ],
+        );
+      },
     );
   }
 
@@ -347,6 +578,22 @@ class _RegisterFarmerScreenState extends State<RegisterFarmerScreen> {
         isPWD: isPWD,
       );
 
+      // Create FarmModel object
+      // FarmModel farm = FarmModel(
+      //   name: farmNameController.text,
+      //   latitude: latitude,
+      //   longitude: longitude,
+      //   animals: animals
+      //       .map((animal) => {
+      //             'type': animal['type'].text,
+      //             'quantity': int.parse(animal['quantity'].text),
+      //           })
+      //       .toList(),
+      //   farmingSystems: selectedFarmingSystems + specifiedFarmingSystems,
+      //   createdDate: farmCreatedDateController.text,
+      //   bioSecurityMeasures: selectedBioSecurityMeasures + specifiedBioSecurityMeasures,
+      // );
+
       setState(() {
         isSubmitting = true;
       });
@@ -354,21 +601,33 @@ class _RegisterFarmerScreenState extends State<RegisterFarmerScreen> {
       // Check internet connection
       var connectivityResult = await Connectivity().checkConnectivity();
       if (connectivityResult != ConnectivityResult.none) {
-        // If connected to the internet, register farmer using the API
-        String endpoint = '${AppConfig.API_BASE_URL}/register-farmer';
+        // If connected to the internet, register farmer and farm using the API
+        String farmerEndpoint = '${AppConfig.API_BASE_URL}/register-farmer';
+        String farmEndpoint = '${AppConfig.API_BASE_URL}/register-farm';
 
-        print("Farmer register endpoint: $endpoint");
+        print("Farmer register endpoint: $farmerEndpoint");
         print("Payload: ${jsonEncode(farmer.toJson())}");
+        print("Farm register endpoint: $farmEndpoint");
+        // print("Payload: ${jsonEncode(farm.toJson())}");
 
         try {
-          final response = await http.post(
-            Uri.parse(endpoint),
+          final farmerResponse = await http.post(
+            Uri.parse(farmerEndpoint),
             headers: {'Content-Type': 'application/json'},
             body: jsonEncode(farmer.toJson()),
           );
 
-          if (response.statusCode == 201) {
-            final responseData = jsonDecode(response.body);
+          // final farmResponse = await http.post(
+          //   Uri.parse(farmEndpoint),
+          //   headers: {'Content-Type': 'application/json'},
+          //   body: jsonEncode(farm.toJson()),
+          // );
+
+          if (farmerResponse.statusCode == 201
+              //  &&
+              // farmResponse.statusCode == 201
+              ) {
+            final responseData = jsonDecode(farmerResponse.body);
             final password = responseData['password'];
             final phoneNumber = farmer.phoneNumber;
             setState(() {
@@ -391,55 +650,29 @@ class _RegisterFarmerScreenState extends State<RegisterFarmerScreen> {
             Get.back();
             // _showRegistrationSuccessDialog(phoneNumber, password);
           } else {
-            print("Response status: ${response.statusCode}");
-            print("Response body: ${response.body}");
-            throw Exception('Failed to register farmer');
+            print("Farmer response status: ${farmerResponse.statusCode}");
+            print("Farmer response body: ${farmerResponse.body}");
+            // print("Farm response status: ${farmResponse.statusCode}");
+            // print("Farm response body: ${farmResponse.body}");
+            throw Exception('Failed to register farmer and farm');
           }
         } catch (e) {
-          print("Failed to register farmer: ${e.toString()}");
+          print("Failed to register farmer and farm: ${e.toString()}");
           setState(() {
             isSubmitting = false;
           });
         }
       } else {
-        // If not connected to the internet, save farmer locally
+        // If not connected to the internet, save farmer and farm locally
         await FarmerModel.saveLocally(farmer);
+        // await FarmModel.saveLocally(farm);
         setState(() {
           isSubmitting = false;
         });
         Utils.toast(
-            "Farmer registered locally. Sync will happen when internet is available.");
+            "Farmer and farm registered locally. Sync will happen when internet is available.");
         Navigator.pop(context);
       }
     }
-  }
-
-  void _showRegistrationSuccessDialog(String phoneNumber, String password) {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text('Registration Successful'),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text('Farmer registered successfully.'),
-              SizedBox(height: 10),
-              Text('Phone Number: $phoneNumber'),
-              Text('Password: $password'),
-            ],
-          ),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.pop(context); // Close the dialog
-                Navigator.pop(context); // Navigate back
-              },
-              child: Text('OK'),
-            ),
-          ],
-        );
-      },
-    );
   }
 }

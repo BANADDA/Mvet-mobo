@@ -371,137 +371,140 @@ class _NewFarmState extends State<NewFarm> {
           print("Settings pressed");
         },
       ),
-      body: Container(
-        color: Colors.white,
-        child: Column(
-          children: [
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 10.0),
-              child: FutureBuilder<LoggedInUserModel>(
-                future: _loggedInUserFuture,
-                builder: (context, snapshot) {
-                  if (snapshot.connectionState == ConnectionState.waiting) {
-                    return Center(
-                      child: CircularProgressIndicator(),
-                    );
-                  } else if (snapshot.hasError) {
-                    return Center(
-                      child: Text('Error: ${snapshot.error}'),
-                    );
-                  } else if (snapshot.hasData) {
-                    LoggedInUserModel _loggedInUser = snapshot.data!;
-                    return UserContainer(
-                      userName: _loggedInUser.name,
-                      imagePath: _loggedInUser.avatar,
-                      district: _loggedInUser.district_name,
-                      districtIcon: Icons.location_city,
-                      role: _loggedInUser.role_name,
-                      roleIcon: Icons.pets,
-                    );
-                  } else {
-                    return SizedBox();
-                  }
-                },
+      body: Expanded(
+        child: Container(
+          color: Colors.white,
+          child: Column(
+            children: [
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 10.0),
+                child: FutureBuilder<LoggedInUserModel>(
+                  future: _loggedInUserFuture,
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return Center(
+                        child: CircularProgressIndicator(),
+                      );
+                    } else if (snapshot.hasError) {
+                      return Center(
+                        child: Text('Error: ${snapshot.error}'),
+                      );
+                    } else if (snapshot.hasData) {
+                      LoggedInUserModel _loggedInUser = snapshot.data!;
+                      return UserContainer(
+                        userName: _loggedInUser.name,
+                        imagePath: _loggedInUser.avatar,
+                        district: _loggedInUser.district_name,
+                        districtIcon: Icons.location_city,
+                        role: _loggedInUser.role_name,
+                        roleIcon: Icons.pets,
+                      );
+                    } else {
+                      return SizedBox();
+                    }
+                  },
+                ),
               ),
-            ),
-            Expanded(
-              child: FutureBuilder<FarmModel?>(
-                future: _firstFarmFuture,
-                builder: (context, snapshot) {
-                  return Container(
-                    color: Colors.white,
-                    child: Column(
-                      children: [
-                        Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                          child: ServiceCard(
-                            title: 'Farm Statistics',
-                            subtitle: 'Click to view farm statistics',
-                            services: [
-                              {
-                                'title': 'Animal Feeds',
-                                'onPressed': () {
-                                  _showFeedsHistory(context);
-                                }
-                              },
-                              {
-                                'title': 'Health Status',
-                                'onPressed': () {
-                                  _showHealthHistory(context);
-                                }
-                              },
-                              {
-                                'title': 'Animal Stock',
-                                'onPressed': () {
-                                  _showAnimalStockHistory(context);
-                                }
-                              },
-                              {
-                                'title': 'Farm Yields',
-                                'onPressed': () {
-                                  _showYieldsHistory(context);
-                                }
-                              },
-                            ],
-                          ),
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: GridView.count(
-                            crossAxisCount: 2,
-                            crossAxisSpacing: 10,
-                            mainAxisSpacing: 10,
-                            shrinkWrap: true,
-                            children: [
-                              buildServiceButton(
-                                  "Feeds", "assets/images/weather.png", () {
-                                _showAnimalFeedsBottomSheet(context);
-                              }),
-                              buildServiceButton(
-                                  "Health", "assets/images/health.png", () {
-                                _showAnimalHealthBottomSheet(context);
-                              }),
-                              buildServiceButton(
-                                  "Animal", "assets/images/cow.png", () {
-                                _showAnimalAnimalBottomSheet(context);
-                              }),
-                              buildServiceButton(
-                                  "Yields", "assets/images/yields.png", () {
-                                _showAnimalYieldsBottomSheet(context);
-                              }),
-                            ],
-                          ),
-                        ),
-                        // Display submitted feeds
-                        if (submittedFeeds.isNotEmpty)
+              Expanded(
+                child: FutureBuilder<FarmModel?>(
+                  future: _firstFarmFuture,
+                  builder: (context, snapshot) {
+                    return Container(
+                      color: Colors.white,
+                      child: Column(
+                        children: [
                           Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: Container(
-                              padding: const EdgeInsets.all(16.0),
-                              decoration: BoxDecoration(
-                                border: Border.all(color: Colors.black),
-                                borderRadius: BorderRadius.circular(10),
-                              ),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: submittedFeeds
-                                    .map((feed) => Padding(
-                                          padding: const EdgeInsets.symmetric(
-                                              vertical: 4.0),
-                                          child: Text(
-                                              'Animal: ${feed['animal']}, Feed: ${feed['name']}, Quantity: ${feed['quantity']} ${feed['unit']}, Date: ${feed['date']}'),
-                                        ))
-                                    .toList(),
-                              ),
+                            padding:
+                                const EdgeInsets.symmetric(horizontal: 8.0),
+                            child: ServiceCard(
+                              title: 'Farm Statistics',
+                              subtitle: 'Click to view farm statistics',
+                              services: [
+                                {
+                                  'title': 'Animal Feeds',
+                                  'onPressed': () {
+                                    _showFeedsHistory(context);
+                                  }
+                                },
+                                {
+                                  'title': 'Health Status',
+                                  'onPressed': () {
+                                    _showHealthHistory(context);
+                                  }
+                                },
+                                {
+                                  'title': 'Animal Stock',
+                                  'onPressed': () {
+                                    _showAnimalStockHistory(context);
+                                  }
+                                },
+                                {
+                                  'title': 'Farm Yields',
+                                  'onPressed': () {
+                                    _showYieldsHistory(context);
+                                  }
+                                },
+                              ],
                             ),
                           ),
-                      ],
-                    ),
-                  );
-                },
+                          Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: GridView.count(
+                              crossAxisCount: 2,
+                              crossAxisSpacing: 10,
+                              mainAxisSpacing: 10,
+                              shrinkWrap: true,
+                              children: [
+                                buildServiceButton(
+                                    "Feeds", "assets/images/weather.png", () {
+                                  _showAnimalFeedsBottomSheet(context);
+                                }),
+                                buildServiceButton(
+                                    "Health", "assets/images/health.png", () {
+                                  _showAnimalHealthBottomSheet(context);
+                                }),
+                                buildServiceButton(
+                                    "Animal", "assets/images/cow.png", () {
+                                  _showAnimalAnimalBottomSheet(context);
+                                }),
+                                buildServiceButton(
+                                    "Yields", "assets/images/yields.png", () {
+                                  _showAnimalYieldsBottomSheet(context);
+                                }),
+                              ],
+                            ),
+                          ),
+                          // Display submitted feeds
+                          if (submittedFeeds.isNotEmpty)
+                            Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: Container(
+                                padding: const EdgeInsets.all(16.0),
+                                decoration: BoxDecoration(
+                                  border: Border.all(color: Colors.black),
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: submittedFeeds
+                                      .map((feed) => Padding(
+                                            padding: const EdgeInsets.symmetric(
+                                                vertical: 4.0),
+                                            child: Text(
+                                                'Animal: ${feed['animal']}, Feed: ${feed['name']}, Quantity: ${feed['quantity']} ${feed['unit']}, Date: ${feed['date']}'),
+                                          ))
+                                      .toList(),
+                                ),
+                              ),
+                            ),
+                        ],
+                      ),
+                    );
+                  },
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

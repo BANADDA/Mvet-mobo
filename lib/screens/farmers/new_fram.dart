@@ -927,7 +927,6 @@ class _NewFarmState extends State<NewFarm> {
                                 if (tempSavedHealth.isNotEmpty) {
                                   setState(() {
                                     submittedFeeds.addAll(tempSavedHealth);
-                                    tempSavedHealth.clear();
                                   });
                                   // Save to database using HealthModel
                                   tempSavedHealth.forEach((health) {
@@ -956,6 +955,9 @@ class _NewFarmState extends State<NewFarm> {
                                     ),
                                   );
                                 }
+                                setState(() {
+                                  tempSavedHealth.clear();
+                                });
                               },
                               style: ElevatedButton.styleFrom(
                                   foregroundColor: Colors.white,
@@ -1163,7 +1165,6 @@ class _NewFarmState extends State<NewFarm> {
                                 if (tempSavedAnimal.isNotEmpty) {
                                   setState(() {
                                     submittedFeeds.addAll(tempSavedAnimal);
-                                    tempSavedAnimal.clear();
                                   });
                                   // Save to database using AnimalsModel
                                   tempSavedAnimal.forEach((animal) {
@@ -1193,6 +1194,9 @@ class _NewFarmState extends State<NewFarm> {
                                     ),
                                   );
                                 }
+                                setState(() {
+                                  tempSavedAnimal.clear();
+                                });
                               },
                               style: ElevatedButton.styleFrom(
                                   foregroundColor: Colors.white,
@@ -1485,7 +1489,6 @@ class _NewFarmState extends State<NewFarm> {
                                     if (tempSavedYields.isNotEmpty) {
                                       setState(() {
                                         submittedFeeds.addAll(tempSavedYields);
-                                        tempSavedYields.clear();
                                       });
                                       // Save to database using YieldsModel
                                       tempSavedYields.forEach((yield) {
@@ -1518,6 +1521,9 @@ class _NewFarmState extends State<NewFarm> {
                                         ),
                                       );
                                     }
+                                    setState(() {
+                                      tempSavedYields.clear();
+                                    });
                                   },
                                   style: ElevatedButton.styleFrom(
                                       foregroundColor: Colors.white,

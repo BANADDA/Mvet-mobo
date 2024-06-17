@@ -1,4 +1,3 @@
-import 'package:marcci/models/LoggedInUserModel.dart';
 import 'package:marcci/models/RespondModel.dart';
 import 'package:sqflite/sqflite.dart';
 
@@ -84,7 +83,7 @@ class YieldsModel {
       Database db = await Utils.getDb();
       await ensureTableColumns(db);
       final Map<String, dynamic> data = yieldData.toJson();
-      data['registeredBy'] = (await LoggedInUserModel.getLoggedInUser()).id;
+      // data['registeredBy'] = (await LoggedInUserModel.getLoggedInUser()).id;
       int id = await db.insert(tableName, data,
           conflictAlgorithm: ConflictAlgorithm.ignore);
       if (id == 0) {

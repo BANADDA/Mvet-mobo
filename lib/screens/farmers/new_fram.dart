@@ -339,6 +339,8 @@ class _NewFarmState extends State<NewFarm> {
                 ),
               ),
               ...items.map((item) => Container(
+                    width: double.infinity,
+                    height: 80, // Fixed height
                     margin: const EdgeInsets.symmetric(vertical: 4.0),
                     padding: const EdgeInsets.all(8.0),
                     decoration: BoxDecoration(
@@ -352,7 +354,8 @@ class _NewFarmState extends State<NewFarm> {
         ),
       );
     });
-    return Column(children: sections);
+    return Column(
+        crossAxisAlignment: CrossAxisAlignment.start, children: sections);
   }
 
   @override

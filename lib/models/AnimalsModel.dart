@@ -1,42 +1,37 @@
+import 'package:marcci/models/LoggedInUserModel.dart';
 import 'package:marcci/models/RespondModel.dart';
 import 'package:sqflite/sqflite.dart';
 
 import '../utils/Utils.dart';
 
-class FeedsModel {
-  static String tableName = 'feeds';
-  static String endpoint = 'feeds';
+class AnimalsModel {
+  static String tableName = 'animals';
+  static String endpoint = 'animals';
   String id;
   String farmID;
   String animal;
-  String name;
   double quantity;
-  String unit;
   String date;
   bool isSynced;
 
-  FeedsModel({
+  AnimalsModel({
     this.id = '',
     this.farmID = '',
     this.animal = '',
-    this.name = '',
     this.quantity = 0.0,
-    this.unit = '',
     this.date = '',
     this.isSynced = false,
   });
 
-  static FeedsModel fromJson(dynamic m) {
+  static AnimalsModel fromJson(dynamic m) {
     if (m == null) {
-      return FeedsModel();
+      return AnimalsModel();
     }
-    return FeedsModel(
+    return AnimalsModel(
       id: Utils.to_str(m['id'], ''),
       farmID: Utils.to_str(m['farmID'], ''),
       animal: Utils.to_str(m['animal'], ''),
-      name: Utils.to_str(m['name'], ''),
       quantity: Utils.to_double(m['quantity'], 0.0),
-      unit: Utils.to_str(m['unit'], ''),
       date: Utils.to_str(m['date'], ''),
       isSynced: m['isSynced'] == 1,
     );
@@ -47,9 +42,7 @@ class FeedsModel {
       'id': id.isEmpty ? Utils.generateUniqueId() : id,
       'farmID': farmID,
       'animal': animal,
-      'name': name,
       'quantity': quantity,
-      'unit': unit,
       'date': date,
       'isSynced': isSynced ? 1 : 0,
     };
@@ -59,9 +52,7 @@ class FeedsModel {
     List<String> requiredColumns = [
       'farmID',
       'animal',
-      'name',
       'quantity',
-      'unit',
       'date',
     ];
     List<Map> tableInfo = await db.rawQuery('PRAGMA table_info($tableName)');
@@ -77,80 +68,74 @@ class FeedsModel {
     }
   }
 
-  static Future<void> saveLocally(FeedsModel feed) async {
-    print("Saving feed: $feed");
+  static Future<void> saveLocally(AnimalsModel animal) async {
     try {
       await initTable();
       Database db = await Utils.getDb();
       await ensureTableColumns(db);
-      final Map<String, dynamic> data = feed.toJson();
-      // data['registeredBy'] = (await LoggedInUserModel.getLoggedInUser()).id;
+      final Map<String, dynamic> data = animal.toJson();
+      data['registeredBy'] = (await LoggedInUserModel.getLoggedInUser()).id;
       int id = await db.insert(tableName, data,
           conflictAlgorithm: ConflictAlgorithm.ignore);
       if (id == 0) {
-        print("Feed already exists");
+        print("Animal data already exists");
         return;
       }
       print("Data inserted successfully.");
     } catch (e) {
       print("An error occurred while saving locally: $e");
       Utils.toast(
-          "An error occurred while saving the feed data."); // Providing user feedback
+          "An error occurred while saving the animal data."); // Providing user feedback
     }
   }
 
-  static Future<bool> syncToServer(FeedsModel feedData) async {
+  static Future<bool> syncToServer(AnimalsModel animalData) async {
     try {
-      Map<String, dynamic> feed = feedData.toJson();
-      feed.remove('isSynced');
+      Map<String, dynamic> animal = animalData.toJson();
+      animal.remove('isSynced');
       RespondModel response =
-          RespondModel(await Utils.http_post(FeedsModel.endpoint, feed));
+          RespondModel(await Utils.http_post(AnimalsModel.endpoint, animal));
       if (response.code == 1) {
         return true;
       } else {
         return false;
       }
     } catch (e) {
-      print('Error syncing feed to server: $e');
+      print('Error syncing animal data to server: $e');
       return false;
     }
   }
 
-  static Future<FeedsModel> getItemById(String id) async {
-    FeedsModel item = FeedsModel();
+  static Future<AnimalsModel> getItemById(String id) async {
+    AnimalsModel item = AnimalsModel();
     try {
       Database db = await Utils.getDb();
       List<Map> maps =
           await db.query(tableName, where: 'id = ?', whereArgs: [id]);
       if (maps.isNotEmpty) {
-        item = FeedsModel.fromJson(maps.first);
+        item = AnimalsModel.fromJson(maps.first);
       }
     } catch (e) {
-      print('Failed to fetch feed: ${e.toString()}');
+      print('Failed to fetch animal data: ${e.toString()}');
     }
     return item;
   }
 
-  static Future<List<FeedsModel>> get_items({String where = '1'}) async {
-    print('Fetching local data with condition: $where');
-    List<FeedsModel> data = await getLocalData(where: where);
-    print('Local data fetched: ${data.length} items');
+  static Future<List<AnimalsModel>> get_items({String where = '1'}) async {
+    List<AnimalsModel> data = await getLocalData(where: where);
     if (data.isEmpty) {
-      print('Local data is empty, fetching online data');
-      await FeedsModel.getOnlineItems();
+      await AnimalsModel.getOnlineItems();
       data = await getLocalData(where: where);
-      print('Data fetched from online: ${data.length} items');
     } else {
-      print('Local data is available, fetching online data in background');
-      FeedsModel.getOnlineItems();
+      AnimalsModel.getOnlineItems();
     }
     return data;
   }
 
-  static Future<List<FeedsModel>> getOnlineItems() async {
-    List<FeedsModel> data = [];
+  static Future<List<AnimalsModel>> getOnlineItems() async {
+    List<AnimalsModel> data = [];
     RespondModel resp =
-        RespondModel(await Utils.http_get('${FeedsModel.endpoint}', {}));
+        RespondModel(await Utils.http_get('${AnimalsModel.endpoint}', {}));
     if (resp.code != 1) {
       return [];
     }
@@ -160,12 +145,12 @@ class FeedsModel {
     }
     if (resp.data.runtimeType.toString().contains('List')) {
       if (await Utils.is_connected()) {
-        await FeedsModel.deleteAll();
+        await AnimalsModel.deleteAll();
       }
       await db.transaction((txn) async {
         var batch = txn.batch();
         for (var x in resp.data) {
-          FeedsModel sub = FeedsModel.fromJson(x);
+          AnimalsModel sub = AnimalsModel.fromJson(x);
           try {
             batch.insert(tableName, sub.toJson(),
                 conflictAlgorithm: ConflictAlgorithm.replace);
@@ -183,9 +168,9 @@ class FeedsModel {
     return data;
   }
 
-  static Future<List<FeedsModel>> getLocalData({String where = "1"}) async {
-    List<FeedsModel> data = [];
-    if (!(await FeedsModel.initTable())) {
+  static Future<List<AnimalsModel>> getLocalData({String where = "1"}) async {
+    List<AnimalsModel> data = [];
+    if (!(await AnimalsModel.initTable())) {
       return data;
     }
     Database db = await Utils.getDb();
@@ -198,7 +183,7 @@ class FeedsModel {
       return data;
     }
     List.generate(maps.length, (i) {
-      data.add(FeedsModel.fromJson(maps[i]));
+      data.add(AnimalsModel.fromJson(maps[i]));
     });
     return data;
   }
@@ -215,7 +200,7 @@ class FeedsModel {
       await db.insert(tableName, toJson(),
           conflictAlgorithm: ConflictAlgorithm.replace);
     } catch (e) {
-      print("Failed to save feed because ${e.toString()}");
+      print("Failed to save animal data because ${e.toString()}");
     }
   }
 
@@ -227,7 +212,7 @@ class FeedsModel {
     try {
       await db.delete(tableName);
     } catch (e) {
-      print("Failed to delete all feeds because ${e.toString()}");
+      print("Failed to delete all animal data because ${e.toString()}");
     }
   }
 
@@ -239,7 +224,7 @@ class FeedsModel {
     try {
       await db.delete(tableName, where: 'id = ?', whereArgs: [id]);
     } catch (e) {
-      print("Failed to delete feed because ${e.toString()}");
+      print("Failed to delete animal data because ${e.toString()}");
     }
   }
 
@@ -253,9 +238,7 @@ CREATE TABLE IF NOT EXISTS $tableName (
   id TEXT PRIMARY KEY,
   farmID TEXT,
   animal TEXT,
-  name TEXT,
   quantity REAL,
-  unit TEXT,
   date TEXT,
   isSynced INTEGER DEFAULT 0
 )''';
@@ -263,7 +246,7 @@ CREATE TABLE IF NOT EXISTS $tableName (
       await db.execute(sql);
       return true;
     } catch (e) {
-      print('Failed to create feeds table because ${e.toString()}');
+      print('Failed to create animals table because ${e.toString()}');
       return false;
     }
   }

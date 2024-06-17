@@ -1,40 +1,41 @@
+import 'package:marcci/models/LoggedInUserModel.dart';
 import 'package:marcci/models/RespondModel.dart';
 import 'package:sqflite/sqflite.dart';
 
 import '../utils/Utils.dart';
 
-class FeedsModel {
-  static String tableName = 'feeds';
-  static String endpoint = 'feeds';
+class YieldsModel {
+  static String tableName = 'yields';
+  static String endpoint = 'yields';
   String id;
   String farmID;
   String animal;
-  String name;
+  String yieldType;
   double quantity;
   String unit;
   String date;
   bool isSynced;
 
-  FeedsModel({
+  YieldsModel({
     this.id = '',
     this.farmID = '',
     this.animal = '',
-    this.name = '',
+    this.yieldType = '',
     this.quantity = 0.0,
     this.unit = '',
     this.date = '',
     this.isSynced = false,
   });
 
-  static FeedsModel fromJson(dynamic m) {
+  static YieldsModel fromJson(dynamic m) {
     if (m == null) {
-      return FeedsModel();
+      return YieldsModel();
     }
-    return FeedsModel(
+    return YieldsModel(
       id: Utils.to_str(m['id'], ''),
       farmID: Utils.to_str(m['farmID'], ''),
       animal: Utils.to_str(m['animal'], ''),
-      name: Utils.to_str(m['name'], ''),
+      yieldType: Utils.to_str(m['yieldType'], ''),
       quantity: Utils.to_double(m['quantity'], 0.0),
       unit: Utils.to_str(m['unit'], ''),
       date: Utils.to_str(m['date'], ''),
@@ -47,7 +48,7 @@ class FeedsModel {
       'id': id.isEmpty ? Utils.generateUniqueId() : id,
       'farmID': farmID,
       'animal': animal,
-      'name': name,
+      'yieldType': yieldType,
       'quantity': quantity,
       'unit': unit,
       'date': date,
@@ -59,7 +60,7 @@ class FeedsModel {
     List<String> requiredColumns = [
       'farmID',
       'animal',
-      'name',
+      'yieldType',
       'quantity',
       'unit',
       'date',
@@ -77,80 +78,74 @@ class FeedsModel {
     }
   }
 
-  static Future<void> saveLocally(FeedsModel feed) async {
-    print("Saving feed: $feed");
+  static Future<void> saveLocally(YieldsModel yieldData) async {
     try {
       await initTable();
       Database db = await Utils.getDb();
       await ensureTableColumns(db);
-      final Map<String, dynamic> data = feed.toJson();
-      // data['registeredBy'] = (await LoggedInUserModel.getLoggedInUser()).id;
+      final Map<String, dynamic> data = yieldData.toJson();
+      data['registeredBy'] = (await LoggedInUserModel.getLoggedInUser()).id;
       int id = await db.insert(tableName, data,
           conflictAlgorithm: ConflictAlgorithm.ignore);
       if (id == 0) {
-        print("Feed already exists");
+        print("Yield data already exists");
         return;
       }
       print("Data inserted successfully.");
     } catch (e) {
       print("An error occurred while saving locally: $e");
       Utils.toast(
-          "An error occurred while saving the feed data."); // Providing user feedback
+          "An error occurred while saving the yield data."); // Providing user feedback
     }
   }
 
-  static Future<bool> syncToServer(FeedsModel feedData) async {
+  static Future<bool> syncToServer(YieldsModel yieldData) async {
     try {
-      Map<String, dynamic> feed = feedData.toJson();
-      feed.remove('isSynced');
+      Map<String, dynamic> yieldMap = yieldData.toJson();
+      yieldMap.remove('isSynced');
       RespondModel response =
-          RespondModel(await Utils.http_post(FeedsModel.endpoint, feed));
+          RespondModel(await Utils.http_post(YieldsModel.endpoint, yieldMap));
       if (response.code == 1) {
         return true;
       } else {
         return false;
       }
     } catch (e) {
-      print('Error syncing feed to server: $e');
+      print('Error syncing yield data to server: $e');
       return false;
     }
   }
 
-  static Future<FeedsModel> getItemById(String id) async {
-    FeedsModel item = FeedsModel();
+  static Future<YieldsModel> getItemById(String id) async {
+    YieldsModel item = YieldsModel();
     try {
       Database db = await Utils.getDb();
       List<Map> maps =
           await db.query(tableName, where: 'id = ?', whereArgs: [id]);
       if (maps.isNotEmpty) {
-        item = FeedsModel.fromJson(maps.first);
+        item = YieldsModel.fromJson(maps.first);
       }
     } catch (e) {
-      print('Failed to fetch feed: ${e.toString()}');
+      print('Failed to fetch yield data: ${e.toString()}');
     }
     return item;
   }
 
-  static Future<List<FeedsModel>> get_items({String where = '1'}) async {
-    print('Fetching local data with condition: $where');
-    List<FeedsModel> data = await getLocalData(where: where);
-    print('Local data fetched: ${data.length} items');
+  static Future<List<YieldsModel>> get_items({String where = '1'}) async {
+    List<YieldsModel> data = await getLocalData(where: where);
     if (data.isEmpty) {
-      print('Local data is empty, fetching online data');
-      await FeedsModel.getOnlineItems();
+      await YieldsModel.getOnlineItems();
       data = await getLocalData(where: where);
-      print('Data fetched from online: ${data.length} items');
     } else {
-      print('Local data is available, fetching online data in background');
-      FeedsModel.getOnlineItems();
+      YieldsModel.getOnlineItems();
     }
     return data;
   }
 
-  static Future<List<FeedsModel>> getOnlineItems() async {
-    List<FeedsModel> data = [];
+  static Future<List<YieldsModel>> getOnlineItems() async {
+    List<YieldsModel> data = [];
     RespondModel resp =
-        RespondModel(await Utils.http_get('${FeedsModel.endpoint}', {}));
+        RespondModel(await Utils.http_get('${YieldsModel.endpoint}', {}));
     if (resp.code != 1) {
       return [];
     }
@@ -160,12 +155,12 @@ class FeedsModel {
     }
     if (resp.data.runtimeType.toString().contains('List')) {
       if (await Utils.is_connected()) {
-        await FeedsModel.deleteAll();
+        await YieldsModel.deleteAll();
       }
       await db.transaction((txn) async {
         var batch = txn.batch();
         for (var x in resp.data) {
-          FeedsModel sub = FeedsModel.fromJson(x);
+          YieldsModel sub = YieldsModel.fromJson(x);
           try {
             batch.insert(tableName, sub.toJson(),
                 conflictAlgorithm: ConflictAlgorithm.replace);
@@ -183,9 +178,9 @@ class FeedsModel {
     return data;
   }
 
-  static Future<List<FeedsModel>> getLocalData({String where = "1"}) async {
-    List<FeedsModel> data = [];
-    if (!(await FeedsModel.initTable())) {
+  static Future<List<YieldsModel>> getLocalData({String where = "1"}) async {
+    List<YieldsModel> data = [];
+    if (!(await YieldsModel.initTable())) {
       return data;
     }
     Database db = await Utils.getDb();
@@ -198,7 +193,7 @@ class FeedsModel {
       return data;
     }
     List.generate(maps.length, (i) {
-      data.add(FeedsModel.fromJson(maps[i]));
+      data.add(YieldsModel.fromJson(maps[i]));
     });
     return data;
   }
@@ -215,7 +210,7 @@ class FeedsModel {
       await db.insert(tableName, toJson(),
           conflictAlgorithm: ConflictAlgorithm.replace);
     } catch (e) {
-      print("Failed to save feed because ${e.toString()}");
+      print("Failed to save yield data because ${e.toString()}");
     }
   }
 
@@ -227,7 +222,7 @@ class FeedsModel {
     try {
       await db.delete(tableName);
     } catch (e) {
-      print("Failed to delete all feeds because ${e.toString()}");
+      print("Failed to delete all yield data because ${e.toString()}");
     }
   }
 
@@ -239,7 +234,7 @@ class FeedsModel {
     try {
       await db.delete(tableName, where: 'id = ?', whereArgs: [id]);
     } catch (e) {
-      print("Failed to delete feed because ${e.toString()}");
+      print("Failed to delete yield data because ${e.toString()}");
     }
   }
 
@@ -253,7 +248,7 @@ CREATE TABLE IF NOT EXISTS $tableName (
   id TEXT PRIMARY KEY,
   farmID TEXT,
   animal TEXT,
-  name TEXT,
+  yieldType TEXT,
   quantity REAL,
   unit TEXT,
   date TEXT,
@@ -263,7 +258,7 @@ CREATE TABLE IF NOT EXISTS $tableName (
       await db.execute(sql);
       return true;
     } catch (e) {
-      print('Failed to create feeds table because ${e.toString()}');
+      print('Failed to create yields table because ${e.toString()}');
       return false;
     }
   }
